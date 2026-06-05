@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+
+    <!-- Font Awesome — provides all the icons (wand, moon, dice, download, triangle) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+    <!-- Main stylesheet — all layout, colors, and dark theme live here -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<!--
+    The "dark-theme" class is added to <body> (not the container) so that the
+    CSS variable overrides in body.dark-theme apply globally to every element.
+    Remove or toggle this class with JS to switch between light and dark mode.
+-->
+<body>
+
+    <!-- ── Outer wrapper ─────────────────────────────────────────────────
+         .container caps the max-width, holds the gradient top border
+         (::before pseudo-element), and wraps header + main-content.
+    ──────────────────────────────────────────────────────────────────── -->
+    <div class="container">
+
+        <!-- ── Header ───────────────────────────────────────────────────
+             Flex row: logo group on the left, theme toggle on the right.
+        ──────────────────────────────────────────────────────────────── -->
+        <header>
+
+            <!-- Logo: icon badge + app title -->
+            <div class="logo">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <h1>AI Image Generator</h1>
+            </div>
+
+            <!--
+                Theme toggle button.
+                JS should:
+                  1. Toggle the "dark-theme" class on <body>
+                  2. Swap the icon between fa-moon (dark) and fa-sun (light)
+            -->
+            <button class="theme-toggle" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+
+        </header><!-- /header -->
+
+
+        <!-- ── Main content panel ───────────────────────────────────────
+             White (or dark) card with a top purple border.
+             Contains the prompt form and the image gallery.
+        ──────────────────────────────────────────────────────────────── -->
+        <div class="main-content">
+
+            <!--
+                The whole UI is wrapped in a <form> so that:
+                - The textarea gets the "required" validation attribute
+                - Pressing Enter / clicking Generate triggers a submit event
+                - JS can listen to the "submit" event to kick off generation
+                action="#" is a placeholder — JS should call e.preventDefault().
+            -->
+            <form action="#" class="prompt-form">
+
+                <!-- ── Prompt textarea ─────────────────────────────────
+                     .prompt-container is position:relative so the dice
+                     button (.prompt-btn) can be absolutely positioned
+                     inside the bottom-right corner of the textarea.
+                ────────────────────────────────────────────────────── -->
+                <div class="prompt-container">
+
+                    <textarea
+                        name="prompt"
+                        placeholder="Describe your imagination in detail..."
+                        required
+                        autofocus
+                    ></textarea>
+
+                    <!--
+                        Dice button — clicking this should fill the textarea
+                        with a random example prompt. type="button" prevents
+                        it from accidentally submitting the form.
+                    -->
+                    <button type="button" class="prompt-btn" aria-label="Random prompt">
+                        <i class="fa-solid fa-dice"></i>
+                    </button>
+
+                </div><!-- /prompt-container -->
+
+
+                <!-- ── Controls row ────────────────────────────────────
+                     Three <select> dropdowns + the Generate button.
+                     On tablet they collapse to a 2-col grid;
+                     on mobile everything stacks in 1 column (see CSS).
+                ────────────────────────────────────────────────────── -->
+                <div class="prompt-actions">
+
+                    <!-- Model selector -->
+                    <div class="select-wrapper">
+                        <select class="custom-select" name="model" required>
+                            <option value="" selected disabled>Select Model</option>
+                            <option value="black-forest-labs/FLUX.1-dev">FLUX.1-dev</option>
+                            <option value="black-forest-labs/FLUX.1-schnell">FLUX.1-schnell</option>
+                            <option value="stabilityai/stable-diffusion-xl-base-1.0">Stable Diffusion XL</option>
+                            <option value="runwayml/stable-diffusion-v1-5">Stable Diffusion v1.5</option>
+                            <option value="prompthero/openjourney">Openjourney</option>
+                        </select>
+                    </div>
+
+                    <!-- How many images to generate -->
+                    <div class="select-wrapper">
+                        <select class="custom-select" name="count" required>
+                            <option value="" selected disabled>Image Count</option>
+                            <option value="1">1 Image</option>
+                            <option value="2">2 Images</option>
+                            <option value="3">3 Images</option>
+                            <option value="4">4 Images</option>
+                        </select>
+                    </div>
+
+                    <!-- Output aspect ratio -->
+                    <div class="select-wrapper">
+                        <select class="custom-select" name="ratio" required>
+                            <option value="" selected disabled>Aspect Ratio</option>
+                            <option value="1/1">Square (1:1)</option>
+                            <option value="16/9">Landscape (16:9)</option>
+                            <option value="9/16">Portrait (9:16)</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit — triggers form "submit" event -->
+                    <button type="submit" class="generate-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        Generate
+                    </button>
+
+                </div><!-- /prompt-actions -->
+
+
+                <!-- ── Gallery grid ─────────────────────────────────────
+                     JS should:
+                     1. Clear this grid before a new generation starts
+                     2. Insert one .img-card per requested image
+                     3. Add class "loading" while the API call is in flight
+                     4. Replace spinner with <img> once the URL is ready
+                     5. Add class "error" (remove "loading") if it fails
+
+                     The static cards below show the three possible states:
+                       • .loading  — spinner visible, image hidden
+                       • .error    — warning icon visible, spinner hidden
+                       • (neither) — image visible with download overlay
+                ────────────────────────────────────────────────────── -->
+                <div class="gallery-grid">
+
+                    <!-- STATE: loading — shown while API call is in flight -->
+                    <div class="img-card loading">
+                        <div class="status-container">
+                            <!-- Spinner: visible in .loading, hidden in .error (CSS) -->
+                            <div class="spinner"></div>
+                            <!-- Warning icon: hidden in .loading, visible in .error (CSS) -->
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <!-- Caption below spinner or icon -->
+                            <p class="status-text">Generating...</p>
+                        </div>
+                        <!-- Image & overlay are hidden while loading (CSS) -->
+                        <img src="" alt="Generated image" class="result-img">
+                        <div class="img-overlay">
+                            <button type="button" class="img-download-btn" aria-label="Download image">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STATE: loaded — image is ready, overlay appears on hover -->
+                    <div class="img-card">
+                        <img src="Images/test.png" alt="Generated image" class="result-img">
+                        <div class="img-overlay">
+                            <button type="button" class="img-download-btn" aria-label="Download image">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STATE: loaded -->
+                    <div class="img-card">
+                        <img src="Images/test.png" alt="Generated image" class="result-img">
+                        <div class="img-overlay">
+                            <button type="button" class="img-download-btn" aria-label="Download image">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STATE: loaded -->
+                    <div class="img-card">
+                        <img src="Images/test.png" alt="Generated image" class="result-img">
+                        <div class="img-overlay">
+                            <button type="button" class="img-download-btn" aria-label="Download image">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div><!-- /gallery-grid -->
+
+            </form><!-- /prompt-form -->
+
+        </div><!-- /main-content -->
+
+    </div><!-- /container -->
+
+    <script src="index.js"></script>
+</body>
+</html>

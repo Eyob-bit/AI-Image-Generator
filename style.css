@@ -1,0 +1,469 @@
+/* =========================================================
+   RESET & BASE
+   Removes all default browser margins/padding and ensures
+   box-sizing includes padding in width calculations.
+   ========================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* =========================================================
+   DESIGN TOKENS — LIGHT THEME (default)
+   All colors are defined here as CSS variables.
+   The rest of the file never uses a raw hex value — only
+   these variables — so switching themes is one block swap.
+   ========================================================= */
+:root {
+    --color-primary:       #5C56E1;  /* main brand purple           */
+    --color-primary-dark:  #5b21b6;  /* darker purple for hovers    */
+    --color-accent:        #8B5CF6;  /* lighter accent purple       */
+    --color-card:          #FFFFFF;  /* card / panel background     */
+    --color-input:         #F1F1FF;  /* textarea & select fill      */
+    --color-text:          #09090E;  /* primary body text           */
+    --color-placeholder:   #5C5A87;  /* placeholder / muted text    */
+    --color-border:        #D4D4ED;  /* borders and dividers        */
+    --color-gradient: linear-gradient(135deg, #5C56E1, #8B5CF6);
+                                     /* brand gradient (buttons etc)*/
+
+    /* Semantic extras derived from the core palette */
+    --color-page-bg:       #e8e7fb;  /* outer page lavender wash    */
+    --color-spinner-track: #D4D4ED;  /* background ring of spinner  */
+    --color-error:         #ef4444;  /* error state icon            */
+    --color-overlay-bg:    rgba(0, 0, 0, 0.8); /* image hover fade  */
+}
+
+/* =========================================================
+   DARK THEME OVERRIDES
+   Added to <body class="dark-theme"> via JS toggle.
+   Only tokens that actually differ in dark mode are listed;
+   brand/primary colors intentionally stay the same.
+   ========================================================= */
+body.dark-theme {
+    --color-card:          #1E293B;  /* dark surface                */
+    --color-input:         #141B2D;  /* darker input fill           */
+    --color-text:          #F3F4F6;  /* near-white text             */
+    --color-placeholder:   #A3B6DC;  /* softer muted text           */
+    --color-border:        #334155;  /* subtle slate border         */
+    --color-page-bg:       #0F172A;  /* deep dark page bg           */
+    --color-spinner-track: #334155;  /* spinner track on dark bg    */
+}
+
+/* =========================================================
+   PAGE / BODY
+   Full-viewport centered grid with the lavender blob blobs
+   visible in both themes via the radial gradients.
+   ========================================================= */
+body {
+    min-height: 100vh;
+    background-color: var(--color-page-bg);
+    /* Decorative radial blobs that give the page depth */
+    background-image:
+        radial-gradient(circle at 15% 50%, rgba(92, 86, 225, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(92, 86, 225, 0.10) 0%, transparent 40%);
+    display: grid;
+    place-items: center;         /* vertically + horizontally center the card */
+    padding: 20px;
+    color: var(--color-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* =========================================================
+   OUTER CONTAINER
+   Reduced max-width + tighter padding so the card fits
+   comfortably inside the viewport without overflowing.
+   ========================================================= */
+.container {
+    max-width: 760px;            /* ← was 920px; smaller fits better */
+    width: 100%;
+    padding: 24px;               /* ← was 32px; less breathing room needed */
+    position: relative;          /* needed for the ::before accent bar */
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--color-card);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--color-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Top gradient accent stripe across the container */
+.container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--color-gradient);
+}
+
+/* =========================================================
+   HEADER
+   Logo left, theme toggle right.
+   ========================================================= */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;         /* tighter than before to save vertical space */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Purple icon badge */
+.logo i {
+    width: 48px;                 /* slightly smaller badge */
+    height: 48px;
+    background: var(--color-primary);
+    color: #fff;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.logo h1,
+header h1 {
+    font-size: 1.75rem;          /* slightly reduced from 2rem */
+    font-weight: 700;
+    color: var(--color-text);
+    transition: color 0.3s ease;
+}
+
+/* Moon / sun toggle button */
+.theme-toggle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background: var(--color-input);
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background: var(--color-border);
+}
+
+/* =========================================================
+   MAIN CONTENT PANEL
+   White card with the top purple border and shadow.
+   ========================================================= */
+.main-content {
+    background: var(--color-card);
+    border-radius: 20px;
+    padding: 28px;               /* was 35px; tighter to save space */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    border-top: 4px solid var(--color-primary);
+    transition: background-color 0.3s ease;
+}
+
+/* =========================================================
+   PROMPT TEXTAREA
+   ========================================================= */
+.prompt-container {
+    position: relative;
+}
+
+.prompt-container textarea {
+    width: 100%;
+    height: 130px;               /* was 150px; slightly shorter */
+    resize: none;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: var(--color-input);
+    color: var(--color-text);
+    padding: 20px 20px 60px 20px; /* bottom padding so text doesn't hide behind dice btn */
+    font-size: 1rem;
+    outline: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.prompt-container textarea::placeholder {
+    color: var(--color-placeholder);
+}
+
+/* Highlight border when focused */
+.prompt-container textarea:focus {
+    border-color: var(--color-primary);
+}
+
+/* Dice button — sits inside the textarea bottom-right */
+.prompt-btn {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.prompt-btn:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.08);
+}
+
+/* =========================================================
+   CONTROLS ROW — selects + generate button
+   ========================================================= */
+.prompt-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.select-wrapper {
+    flex: 1;                     /* each select grows equally */
+    min-width: 0;                /* prevents overflow in flex */
+}
+
+.custom-select {
+    width: 100%;
+    height: 48px;
+    border: 1px solid var(--color-border);
+    border-radius: 11px;
+    padding: 0 12px;
+    background: var(--color-input);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-select:focus {
+    border-color: var(--color-primary);
+}
+
+/* Generate button — gradient pill on the right */
+.generate-btn {
+    height: 48px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 11px;
+    background: var(--color-gradient);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;         /* never wraps to two lines */
+    flex-shrink: 0;              /* never squishes when space is tight */
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.generate-btn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   IMAGE GALLERY GRID
+   Auto-fill so it adapts to available width.
+   ========================================================= */
+.main-content .gallery-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* ---- Individual image card ---- */
+.gallery-grid .img-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;             /* always a perfect square */
+    border-radius: 14px;
+    background: var(--color-input);
+    border: 1px solid var(--color-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease,
+                background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Lift on hover — only when card is fully loaded */
+.gallery-grid .img-card:not(.loading, .error):hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(92, 86, 225, 0.18);
+}
+
+/* Image fills the card entirely */
+.gallery-grid .img-card .result-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* While loading or errored: hide the actual image and overlay */
+.gallery-grid .img-card:is(.loading, .error) :is(.result-img, .img-overlay) {
+    display: none;
+}
+
+/* ---- Download overlay (fades in on hover) ---- */
+.gallery-grid .img-card .img-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    display: flex;
+    opacity: 0;
+    pointer-events: none;
+    justify-content: flex-end;
+    background: linear-gradient(transparent, var(--color-overlay-bg));
+    transition: opacity 0.3s ease;
+}
+
+.gallery-grid .img-card:hover .img-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Download icon button inside the overlay */
+.gallery-grid .img-card .img-download-btn {
+    height: 40px;
+    width: 40px;
+    color: #fff;
+    backdrop-filter: blur(5px);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.25);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.gallery-grid .img-card .img-download-btn:hover {
+    transform: scale(1.08);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* ---- Status container (spinner or error icon + text) ---- */
+.gallery-grid .img-card .status-container {
+    padding: 15px;
+    display: none;               /* hidden unless .loading or .error is present */
+    gap: 12px;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Show status area when card has loading or error class */
+.gallery-grid .img-card:where(.loading, .error) .status-container {
+    display: flex;
+}
+
+/* While loading: hide warning icon.  On error: hide spinner. */
+.gallery-grid .img-card.loading .status-container i,
+.gallery-grid .img-card.error .spinner {
+    display: none;
+}
+
+/* Red warning icon shown in error state */
+.gallery-grid .img-card.error .status-container i {
+    font-size: 1.6rem;
+    color: var(--color-error);
+}
+
+/* Muted caption below the spinner or error icon */
+.gallery-grid .img-card .status-text {
+    font-size: 0.82rem;
+    text-align: center;
+    color: var(--color-placeholder);
+}
+
+/* Spinning ring — uses primary color for the active segment */
+.gallery-grid .img-card .spinner {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid var(--color-spinner-track); /* full track ring  */
+    border-top-color: var(--color-primary);        /* spinning segment */
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET  (≤ 768px)
+   Selects collapse to 2-column grid; Generate spans both.
+   ========================================================= */
+@media (max-width: 768px) {
+    .prompt-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .generate-btn {
+        grid-column: span 2;
+        justify-content: center;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE  (≤ 600px)
+   Everything single-column; reduce padding and font sizes.
+   ========================================================= */
+@media (max-width: 600px) {
+    .container {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .main-content {
+        padding: 18px;
+    }
+
+    .prompt-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .generate-btn {
+        grid-column: span 1;
+        width: 100%;
+        justify-content: center;
+    }
+
+    header h1 {
+        font-size: 1.3rem;
+    }
+
+    .logo i {
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+    }
+
+    .prompt-container textarea {
+        height: 110px;
+    }
+}
