@@ -1,6 +1,12 @@
 {
-    "rewrites": [
-        { "source": "/submit", "destination": "/api/submit" },
-        { "source": "/check", "destination": "/api/check" }
+    "version": 2,
+    "builds": [
+        { "src": "index.html", "use": "@vercel/static" },
+        { "src": "api/*.js", "use": "@vercel/node" }
+    ],
+    "routes": [
+        { "src": "/submit", "dest": "/api/submit.js" },
+        { "src": "/check", "dest": "/api/check.js" },
+        { "src": "/(.*)", "dest": "/$1" }
     ]
 }
