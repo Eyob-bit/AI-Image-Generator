@@ -1,0 +1,28 @@
+{
+  "name": "ai-image-generator",
+  "version": "1.0.0",
+  "description": "A modern and responsive AI Image Generator web application built with HTML, CSS, and JavaScript.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eyob-bit/AI-Image-Generator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Eyob-bit/AI-Image-Generator/issues"
+  },
+  "homepage": "https://github.com/Eyob-bit/AI-Image-Generator#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "node-fetch": "^2.7.0"
+  }
+}
