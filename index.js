@@ -119,25 +119,34 @@ const generateImages = async (selectedModel, imageCount, aspectRatio, promptText
 
     const imagePromises = Array.from({ length: imageCount }, async (_, i) => {
         try {
-            const response = await fetch("/generate", {
+            // Step 1: Submit
+            const submitRes = await fetch("/submit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    inputs: promptText,
-                    parameters: { width, height }
-                })
+                body: JSON.stringify({ inputs: promptText, parameters: { width, height } })
             });
+            const { id, error } = await submitRes.json();
+            if (!id) throw new Error(error || "Failed to submit");
 
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || "Failed");
+            // Step 2: Poll from the browser
+            for (let attempt = 0; attempt < 60; attempt++) {
+                await new Promise(r => setTimeout(r, 4000));
+                const checkRes = await fetch(`/check?id=${id}`);
+
+                if (checkRes.headers.get("content-type")?.includes("image")) {
+                    const blob = await checkRes.blob();
+                    updateImageCard(i, URL.createObjectURL(blob));
+                    return;
+                }
+
+                const status = await checkRes.json();
+                if (!status.done) continue;
             }
 
-            const blob = await response.blob();
-            updateImageCard(i, URL.createObjectURL(blob));
+            throw new Error("Timed out");
 
-        } catch (error) {
-            handleCardError(i, error.message);
+        } catch (err) {
+            handleCardError(i, err.message);
         }
     });
 
